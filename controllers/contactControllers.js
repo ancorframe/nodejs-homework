@@ -43,7 +43,7 @@ const updateContactsByIdController = async (req, res) => {
   if (!updateContact) {
     throw new NotFound(`Contact with id ${postId} not found`);
   }
-  res.json({ message: `contact with id:${postId} updated` });
+  res.json({ message: `contact with id:${postId} updated`, updateContact });
 };
 
 const deleteContactsByIdController = async (req, res) => {
