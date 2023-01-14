@@ -1,13 +1,10 @@
-const {
-  BadRequest,
-  Conflict,
-  Unauthorized,
-} = require("../helpers/errors");
+const { BadRequest, Conflict, Unauthorized } = require("../helpers/errors");
 const {
   registerUser,
   loginUser,
   logoutUser,
   updateSubscription,
+  updateAvatar,
 } = require("../services/usersService");
 
 const registerUserController = async (req, res) => {
@@ -55,10 +52,18 @@ const updateSubscriptionController = async (req, res) => {
   res.json({ message: `subscription updated to: ${subscription}` });
 };
 
+const updateAvatarController = async (req, res) => {
+
+  const filename = req.file.filename;
+  const url = await updateAvatar(req, filename);
+  res.json({ avatarURL: `${url}` });
+};
+
 module.exports = {
   registerUserController,
   loginUserController,
   logoutUserController,
   currentUserController,
   updateSubscriptionController,
+  updateAvatarController,
 };

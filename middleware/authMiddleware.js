@@ -6,7 +6,7 @@ const authMiddleware = async (req, res, next) => {
   if (!req.headers.authorization) {
     next(new Unauthorized());
   }
-  const [token] = req.headers.authorization.split(" ");
+  const [, token] = req.headers.authorization.split(" ");
   if (!token) {
     next(new Unauthorized());
   }
