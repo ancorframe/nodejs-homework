@@ -14,6 +14,4 @@ const PORT = process.env.PORT;
   } catch (error) {
     console.error(error);
   }
-})()
-
-
+})();
