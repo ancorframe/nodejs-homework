@@ -19,7 +19,7 @@ const registerUser = async (email, password) => {
     link: `${UI_URL}/api/auth/users/verify/${verificationToken}`,
   });
   if (!send) {
-    return;
+    throw new Error()
   }
   return save;
 };
@@ -27,11 +27,11 @@ const registerUser = async (email, password) => {
 const loginUser = async (email, password) => {
   const user = await User.findOne({ email, verify: true });
   if (!user) {
-    return;
+    throw new Error();
   }
   const decodePassword = await bcrypt.compare(password, user.password);
   if (!decodePassword) {
-    return;
+    throw new Error();
   }
   const token = jwt.sign(
     { _id: user._id, email: user.email },
@@ -41,7 +41,7 @@ const loginUser = async (email, password) => {
     $set: { token },
   });
   if (!updateUser) {
-    return;
+    throw new Error();
   }
   return { user, token };
 };
@@ -82,7 +82,7 @@ const updateAvatar = async (req, filename) => {
 const verificationUser = async (verificationToken) => {
   const user = await User.findOne({ verificationToken, verify: false });
   if (!user) {
-    return;
+    throw new Error();
   }
   await User.findByIdAndUpdate(user._id, {
     $set: { verificationToken: null },
@@ -93,22 +93,22 @@ const verificationUser = async (verificationToken) => {
 const verifyUser = async (email) => {
   const user = await User.findOne({ email, verify: false });
   if (!user) {
-    return;
+    throw new Error();
   }
   const send = await sendEmail({
     to: email,
     link: `${UI_URL}/api/auth/users/verify/${user.verificationToken}`,
   });
   if (!send) {
-    return;
+    throw new Error();
   }
   return user;
 };
 
 const forgotPasswordUser = async (email) => {
-  const user = await User.findOne({ email, verify: true }); // дістаю юзера
+  const user = await User.findOne({ email, verify: true });
   if (!user) {
-    return;
+    throw new Error();
   }
   const token = jwt.sign(
     { _id: user._id, email: user.email },
@@ -118,15 +118,14 @@ const forgotPasswordUser = async (email) => {
     $set: { token },
   });
   if (!updateUser) {
-    return;
+    throw new Error();
   }
   const send = await sendEmail({
-    // створюю токен для надсилання на ui restorePassword
     to: email,
     link: `${UI_URL}/restorePassword/${token}`,
   });
   if (!send) {
-    return;
+    throw new Error();
   }
   return user;
 };
@@ -134,13 +133,13 @@ const forgotPasswordUser = async (email) => {
 const restorePasswordUser = async (_id, password) => {
   const user = await User.findOne({ _id, verify: true });
   if (!user) {
-    return;
+    throw new Error();
   }
   const updatePasswordUser = await User.findByIdAndUpdate(user.id, {
     $set: { password },
   });
   if (!updatePasswordUser) {
-    return;
+    throw new Error();
   }
   return user;
 };

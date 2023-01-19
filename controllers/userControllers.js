@@ -27,12 +27,13 @@ const registerUserController = async (req, res) => {
 };
 
 const loginUserController = async (req, res) => {
-  const { email, password } = req.body;
-  const login = await loginUser(email, password);
-  if (!login) {
+  try {
+    const { email, password } = req.body;
+    const login = await loginUser(email, password);
+    res.json({ login });
+  } catch (error) {
     throw new Unauthorized("Email or password is wrong");
   }
-  res.json({ login });
 };
 
 const logoutUserController = async (req, res) => {
@@ -52,13 +53,14 @@ const updateSubscriptionController = async (req, res) => {
   if (!subscription) {
     throw new BadRequest("missing field subscription");
   }
-  const update = await updateSubscription(_id, subscription);
-  if (!update) {
+  try {
+    await updateSubscription(_id, subscription);
+    res.json({ message: `subscription updated to: ${subscription}` });
+  } catch (error) {
     throw new BadRequest(
       "subscription can be only ['starter', 'pro', 'business']"
     );
   }
-  res.json({ message: `subscription updated to: ${subscription}` });
 };
 
 const updateAvatarController = async (req, res) => {
@@ -69,39 +71,43 @@ const updateAvatarController = async (req, res) => {
 
 const verificationUserController = async (req, res) => {
   const { verificationToken } = req.params;
-  if (verificationToken) {
+  if (!verificationToken) {
     throw new NotFound("Something wrong(. Try again");
   }
-  const verify = await verificationUser(verificationToken);
-  if (!verify) {
+  try {
+    await verificationUser(verificationToken);
+    res.json({ message: "Verification successful" });
+  } catch (error) {
     throw new NotFound("User not found");
   }
-  res.json({ message: "Verification successful" });
 };
 
 const verifyUserController = async (req, res) => {
   const { email } = req.body;
-  const verify = await verifyUser(email);
-  if (!verify) {
+  try {
+    await verifyUser(email);
+    res.json({ message: "Verification email sent" });
+  } catch (error) {
     throw new BadRequest("Verification has already been passed");
   }
-  res.json({ message: "Verification email sent" });
 };
 
 const forgotPasswordUserController = async (req, res) => {
   const { email } = req.body;
-  const forgotPassword = await forgotPasswordUser(email);
-  if (!forgotPassword) {
+  try {
+    await forgotPasswordUser(email);
+    res.json({ message: "Restore email sent" });
+  } catch (error) {
     throw new BadRequest("Something wrong( Try again");
   }
-  res.json({ message: "Restore email sent" });
 };
 
 const restorePasswordUserController = async (req, res) => {
   const { _id } = req.user;
   const { password } = req.body;
-  const restorePassword = await restorePasswordUser(_id, password);
-  if (!restorePassword) {
+  try {
+    await restorePasswordUser(_id, password);
+  } catch (error) {
     throw new BadRequest("Something wrong( Try again");
   }
   res.json({ message: "Password was change" });
